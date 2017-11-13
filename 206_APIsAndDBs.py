@@ -19,7 +19,7 @@ import json
 import sqlite3
 
 
-## Your name:
+## Your name: Alex Shell
 ## The names of anyone you worked with on this project:
 
 #####
@@ -48,13 +48,20 @@ api = tweepy.API(auth, parser=tweepy.parsers.JSONParser())
 ## CACHE_FNAME variable for you for the cache file name, but you must
 ## write the rest of the code in this file.
 
-#CACHE_FNAME = "206_APIsAndDBs_cache.json"
+CACHE_FNAME = "206_APIsAndDBs_cache.json"
 # Put the rest of your caching setup here:
-
+try:
+    cache_file = open(CACHE_FNAME,'r')
+    cache_contents = cache_file.read()
+    cache_file.close()
+    CACHE_DICTION = json.loads(cache_contents)
+except:
+    CACHE_DICTION = {}
 
 
 # Define your function get_user_tweets here:
-
+def get_user_tweets():
+	
 
 
 
