@@ -60,15 +60,28 @@ except:
 
 
 # Define your function get_user_tweets here:
-def get_user_tweets():
-	
+def get_user_tweets(user):
+	if user in CACHE_DICTION:
+		print('Accessing Cache')
+		tweet_results = CACHE_DICTION[user]
+
+	else:
+		print('Processing API Request')
+		tweet_results = api.user_timeline(id=user, count=20)
+		CACHE_DICTION['user'] = tweet_results
+
+		f = open(CACHE_FNAME,'w')
+		f.write(json.dumps(CACHE_DICTION, indent=2))
+		f.close()
+
+	return tweet_results
 
 
 
 
 # Write an invocation to the function for the "umich" user timeline and
 # save the result in a variable called umich_tweets:
-
+umich_tweets = get_user_tweets('umich')
 
 
 
@@ -93,6 +106,16 @@ cur.execute('CREATE TABLE Users (user_id TEXT PRIMARY KEY, screen_name TEXT, num
 # the user_id column! See below hints.
 cur.execute('DROP TABLE IF EXISTS Tweets')
 cur.execute('CREATE TABLE Tweets (tweet_id TEXT PRIMARY KEY, text TEXT, user_posted TEXT, time_posted DATETIME, retweets INT, FOREIGN KEY(user_posted) REFERENCES users_posted(user_id))')
+
+for ur in umich_tweets:
+	tup = (ur['user']['id'], ur['user']['screen_name'], ur['user']['favourites_count'], ur['user']['description'])
+	cur.execute('INSERT INTO Users (user_id, screen_name, num_favs, description) VALUES (?, ?, ?, ?)', tup)
+
+for tw in umich_tweets:
+	tup = (tw['id_str'], tw['text'], tw['user']['id'], tw['created_at'], tw['retweet_count'])
+	cur.execute('INSERT INTO Tweets (tweet_id, text, user_posted, time_posted, retweets) VALUES (?, ?, ?, ?, ?)', tup)
+
+conn.commit()
 
 ## HINT: There's a Tweepy method to get user info, so when you have a
 ## user id or screenname you can find alllll the info you want about
